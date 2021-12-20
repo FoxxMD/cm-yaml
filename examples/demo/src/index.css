@@ -1,0 +1,122 @@
+:root {
+  --background-color: hsl(0, 0%, 96%);
+  --editor-background: hsl(60, 100%, 100%);
+  --foreground-color: hsl(0, 0%, 0%);
+  --primary-color: hsl(189, 100%, 63%);
+  --shadow-color: hsla(0, 0%, 27%, 0.239);
+  --warning-color: hsl(49, 100%, 40%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: hsl(0, 0%, 23%);
+    --editor-background: hsl(0, 0%, 12%);
+    --foreground-color: hsl(0, 0%, 100%);
+    --shadow-color: hsl(0, 0%, 43%);
+    --warning-color: hsl(49, 100%, 40%);
+  }
+}
+
+body {
+  background: rgba(31,41,55);
+  display: flex;
+  flex-flow: column;
+  font-family: sans-serif;
+  height: 100vh;
+  margin: 0;
+}
+
+h1 {
+  margin: 0 1rem;
+}
+
+nav {
+  align-items: center;
+  background-color: rgba(107,114,128);
+  color: white;
+  display: flex;
+  flex: 0 0 auto;
+  height: 3rem;
+  justify-content: space-between;
+}
+
+.nav-icon {
+  text-decoration: none;
+}
+
+.nav-icon > img {
+  height: 2rem;
+  margin-right: 1rem;
+  vertical-align: middle;
+}
+
+.editor-wrapper {
+  background: var(--editor-background);
+  box-shadow: 0 0 10px var(--shadow-color);
+  display: flex;
+  flex: 1 1 auto;
+  flex-flow: column;
+  margin: 1.5rem;
+}
+
+#schema-selection {
+  background-color: var(--editor-background);
+  border: none;
+  border-bottom: 1px solid var(--shadow-color);
+  color: var(--foreground-color);
+  width: 100%;
+}
+
+#breadcrumbs {
+  border-bottom: 1px solid var(--shadow-color);
+  color: var(--foreground-color);
+  flex: 0 0 1rem;
+}
+
+.breadcrumb {
+  cursor: pointer;
+}
+
+#breadcrumbs::before,
+.breadcrumb:not(:last-child)::after {
+  content: '›';
+  margin: 0 0.2rem;
+}
+
+.breadcrumb.array::before {
+  content: '[]';
+}
+
+.breadcrumb.object::before {
+  content: '{}';
+}
+
+#editor {
+  flex: 1 1 auto;
+}
+
+#problems {
+background: rgba(59,60,63);
+  flex: 0 0 20vh;
+  color: white;
+  overflow-y: scroll;
+}
+
+.problem {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  padding: 0.25rem;
+}
+
+.problem:hover {
+  background-color: var(--shadow-color);
+}
+
+.problem-text {
+  margin-left: 0.5rem;
+}
+
+.problem .codicon-warning {
+  color: var(--warning-color);
+}
