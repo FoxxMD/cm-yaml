@@ -16,6 +16,5 @@ npm --workspace demo start
 # Usage in [ContextMod](http://github.com/foxxmd/context-mod)
 
 * Uncomment the `publicPath` in `examples/demo/webpack.config.js
-* Run `npm --workspace demo build`
+* Run `cd examples/demo; npm run build`
 * Copy all files from `examples/demo/dist` to `src/Web/assets/public/yaml` in your context-mod repo
-

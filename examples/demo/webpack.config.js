@@ -1,14 +1,17 @@
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
 
 module.exports = {
+  mode: 'production',
   output: {
-    filename: '[contenthash].js',
+    filename: 'entry.js',
     // uncomment this before running development
-    // publicPath: '/public/yaml/'
+    //publicPath: '/public/yaml/',
+    clean: true
   },
-  devtool: 'source-map',
+  //devtool: 'source-map',
   resolve: {
     extensions: ['.mjs', '.js', '.ts'],
   },
@@ -36,6 +39,7 @@ module.exports = {
   },
   optimization: {
     minimizer: ['...', new CssMinimizerPlugin()],
+    concatenateModules: true,
   },
-  plugins: [new HtmlWebPackPlugin(), new MiniCssExtractPlugin({ filename: '[contenthash].css' })],
+  plugins: [new HtmlWebPackPlugin(), new MiniCssExtractPlugin({ filename: 'entry.css' })],
 };
