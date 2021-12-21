@@ -1,6 +1,7 @@
-import './index.css';
+// uncomment to develop locally
+//import './index.css';
 
-import { JSONSchemaForSchemaStoreOrgCatalogFiles } from '@schemastore/schema-catalog';
+//import { JSONSchemaForSchemaStoreOrgCatalogFiles } from '@schemastore/schema-catalog';
 import { CancellationToken } from 'monaco-editor/esm/vs/base/common/cancellation';
 import { getDocumentSymbols } from 'monaco-editor/esm/vs/editor/contrib/documentSymbols/documentSymbols';
 import {
@@ -17,8 +18,6 @@ import { SchemasSettings, setDiagnosticsOptions } from 'monaco-yaml';
 // features you want to use, import them each individually. See this example: (https://github.com/microsoft/monaco-editor-samples/blob/main/browser-esm-webpack-small/index.js#L1-L91)
 import 'monaco-editor';
 
-import defaultSchemaUri from './schema.json';
-
 declare global {
   interface Window {
     MonacoEnvironment: Environment;
@@ -32,20 +31,50 @@ window.MonacoEnvironment = {
         return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker', import.meta.url));
       case 'yaml':
         return new Worker(new URL('monaco-yaml/yaml.worker', import.meta.url));
+      case 'json':
+        return new Worker(new URL('monaco-editor/esm/vs/language/json/json.worker', import.meta.url));
       default:
         throw new Error(`Unknown label ${label}`);
     }
   },
 };
 
-const defaultSchema: SchemasSettings = {
-  uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/App.json',
-  fileMatch: ['bot.yaml'],
-};
+const yamlSchemas = [
+  {
+    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/App.json',
+    fileMatch: ['bot.yaml'],
+  },
+  {
+    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/OperatorConfig.json',
+    fileMatch: ['app.yaml'],
+  }
+];
+
+const jsonSchemas = [
+  {
+    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/App.json',
+    fileMatch: ['bot.json'],
+  },
+  {
+    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/OperatorConfig.json',
+    fileMatch: ['app.json'],
+  }
+];
 
 setDiagnosticsOptions({
-  schemas: [defaultSchema],
+  schemas: yamlSchemas,
 });
+
+languages.json.jsonDefaults.setDiagnosticsOptions({
+  validate: true,
+  allowComments: true,
+  trailingCommas: "ignore",
+  schemas: jsonSchemas,
+  enableSchemaRequest: true,
+});
+
+// @ts-ignore
+window.meditor = editor;
 
 const value = `
 # Copy + paste your configuration here to get
@@ -57,19 +86,16 @@ const ed = editor.create(document.getElementById('editor'), {
     enabled: false
   },
   automaticLayout: true,
-  model: editor.createModel(value, 'yaml', Uri.parse('bot.yaml')),
+  model: editor.createModel(' ', 'yaml', Uri.parse('bot.yaml')),
   theme: 'vs-dark',
 });
 
-const select = document.getElementById('schema-selection') as HTMLSelectElement;
+// @ts-ignore
+window.ed = ed;
+// @ts-ignore
+window.muri = Uri;
 
-const schemas = [
-  defaultSchema,
-  {
-    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/OperatorConfig.json',
-    fileMatch: ['app.yaml'],
-  }
-];
+const select = document.getElementById('schema-selection') as HTMLSelectElement;
 
 const option = document.createElement('option');
 option.value = 'app.yaml';
@@ -82,7 +108,7 @@ setDiagnosticsOptions({
   format: true,
   hover: true,
   completion: true,
-  schemas,
+  schemas: yamlSchemas,
 });
 
 // fetch('https://www.schemastore.org/api/json/catalog.json').then(async (response) => {
@@ -119,74 +145,74 @@ setDiagnosticsOptions({
 //   });
 // });
 
-var searchParams = new URLSearchParams(window.location.search);
-let dlUrl = searchParams.get('url');
-if(dlUrl === null && searchParams.get('subreddit') !== null) {
-  dlUrl = `${document.location.origin}/config/content${document.location.search}`
-}
+// var searchParams = new URLSearchParams(window.location.search);
+// let dlUrl = searchParams.get('url');
+// if(dlUrl === null && searchParams.get('subreddit') !== null) {
+//   dlUrl = `${document.location.origin}/config/content${document.location.search}`
+// }
+//
+// if(searchParams.get('schema') === 'operator') {
+//   // @ts-ignore
+//   document.querySelector('#schema-selection').value = 'app.yaml';
+// }
 
-if(searchParams.get('schema') === 'operator') {
-  // @ts-ignore
-  document.querySelector('#schema-selection').value = 'app.yaml';
-}
+// if(dlUrl !== null) {
+//   // @ts-ignore
+//   document.querySelector('#configUrl').value = dlUrl;
+//   fetch(dlUrl).then((resp) => {
+//     if(!resp.ok) {
+//       resp.text().then(data => {
+//         document.querySelector('#error').innerHTML = `Error occurred while fetching configuration => ${data}`
+//       });
+//     } else {
+//       resp.text().then(data => {
+//         const oldModel = ed.getModel();
+//         oldModel.dispose();
+//         // @ts-ignore
+//         const newModel = editor.createModel(data, 'yaml', Uri.parse(document.querySelector('#schema-selection').value));
+//         ed.setModel(newModel);
+//       })
+//     }
+//   });
+// }
+//
+// document.querySelector('#loadConfig').addEventListener('click', (e) => {
+//   e.preventDefault();
+//   // @ts-ignore
+//   const newUrl = document.querySelector('#configUrl').value;
+//   fetch(newUrl).then((resp) => {
+//     if(!resp.ok) {
+//       resp.text().then(data => {
+//         document.querySelector('#error').innerHTML = `Error occurred while fetching configuration => ${data}`
+//       });
+//     } else {
+//       var sp = new URLSearchParams();
+//       // @ts-ignore
+//       sp.append('schema', document.querySelector('#schema-selection').value === 'bot.yaml' ? 'bot' : 'operator' );
+//       sp.append('url', newUrl);
+//       sp.append('format', 'yaml');
+//       history.pushState(null, '', `${window.location.pathname}?${sp.toString()}`);
+//       resp.text().then(data => {
+//         const oldModel = ed.getModel();
+//         oldModel.dispose();
+//         // @ts-ignore
+//         const newModel = editor.createModel(data, 'yaml', Uri.parse(document.querySelector('#schema-selection').value));
+//         ed.setModel(newModel);
+//       })
+//     }
+//   });
+// });
 
-if(dlUrl !== null) {
-  // @ts-ignore
-  document.querySelector('#configUrl').value = dlUrl;
-  fetch(dlUrl).then((resp) => {
-    if(!resp.ok) {
-      resp.text().then(data => {
-        document.querySelector('#error').innerHTML = `Error occurred while fetching configuration => ${data}`
-      });
-    } else {
-      resp.text().then(data => {
-        const oldModel = ed.getModel();
-        oldModel.dispose();
-        // @ts-ignore
-        const newModel = editor.createModel(data, 'yaml', Uri.parse(document.querySelector('#schema-selection').value));
-        ed.setModel(newModel);
-      })
-    }
-  });
-}
-
-document.querySelector('#loadConfig').addEventListener('click', (e) => {
-  e.preventDefault();
-  // @ts-ignore
-  const newUrl = document.querySelector('#configUrl').value;
-  fetch(newUrl).then((resp) => {
-    if(!resp.ok) {
-      resp.text().then(data => {
-        document.querySelector('#error').innerHTML = `Error occurred while fetching configuration => ${data}`
-      });
-    } else {
-      var sp = new URLSearchParams();
-      // @ts-ignore
-      sp.append('schema', document.querySelector('#schema-selection').value === 'bot.yaml' ? 'bot' : 'operator' );
-      sp.append('url', newUrl);
-      sp.append('format', 'yaml');
-      history.pushState(null, '', `${window.location.pathname}?${sp.toString()}`);
-      resp.text().then(data => {
-        const oldModel = ed.getModel();
-        oldModel.dispose();
-        // @ts-ignore
-        const newModel = editor.createModel(data, 'yaml', Uri.parse(document.querySelector('#schema-selection').value));
-        ed.setModel(newModel);
-      })
-    }
-  });
-});
-
-select.addEventListener('change', () => {
-
-  var searchParams = new URLSearchParams(window.location.search);
-  searchParams.set('schema', select.value === 'bot.yaml' ? 'bot' : 'operator')
-  history.pushState(null, '', `${window.location.pathname}?${searchParams.toString()}`);
-  const oldModel = ed.getModel();
-  const newModel = editor.createModel(oldModel.getValue(), 'yaml', Uri.parse(select.value));
-  ed.setModel(newModel);
-  oldModel.dispose();
-});
+// select.addEventListener('change', () => {
+//
+//   var searchParams = new URLSearchParams(window.location.search);
+//   searchParams.set('schema', select.value === 'bot.yaml' ? 'bot' : 'operator')
+//   history.pushState(null, '', `${window.location.pathname}?${searchParams.toString()}`);
+//   const oldModel = ed.getModel();
+//   const newModel = editor.createModel(oldModel.getValue(), 'yaml', Uri.parse(select.value));
+//   ed.setModel(newModel);
+//   oldModel.dispose();
+// });
 
 function* iterateSymbols(
   symbols: languages.DocumentSymbol[],
@@ -201,6 +227,9 @@ function* iterateSymbols(
 }
 
 ed.onDidChangeCursorPosition(async (event) => {
+  if(ed.getModel().getLanguageId() === 'json') {
+    return;
+  }
   const breadcrumbs = document.getElementById('breadcrumbs');
   const symbols = await getDocumentSymbols(ed.getModel(), false, CancellationToken.None);
   while (breadcrumbs.lastChild) {
