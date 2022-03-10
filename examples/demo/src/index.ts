@@ -39,24 +39,28 @@ window.MonacoEnvironment = {
   },
 };
 
+const subredditSchema = `${document.location.origin}/schemas/App.json`;
+const operatorSchema = `${document.location.origin}/schemas/OperatorConfig.json`;
+
+// https://github.com/microsoft/monaco-editor/issues/365#issuecomment-293722270
 const yamlSchemas = [
   {
-    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/App.json',
+    uri: subredditSchema,
     fileMatch: ['bot.yaml'],
   },
   {
-    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/OperatorConfig.json',
+    uri: operatorSchema,
     fileMatch: ['app.yaml'],
   }
 ];
 
 const jsonSchemas = [
   {
-    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/App.json',
+    uri: subredditSchema,
     fileMatch: ['bot.json'],
   },
   {
-    uri: 'https://raw.githubusercontent.com/FoxxMD/context-mod/master/src/Schema/OperatorConfig.json',
+    uri: operatorSchema,
     fileMatch: ['app.json'],
   }
 ];
